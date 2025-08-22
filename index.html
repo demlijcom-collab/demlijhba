@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-ar="إدارة المخزون" data-fr="Gestion d'Inventaire">إدارة المخزون</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 data-ar="إدارة المخزون" data-fr="Gestion d'Inventaire">إدارة المخزون</h1>
+                <div class="header-actions">
+                    <button class="lang-toggle" id="langToggle">
+                        <i class="fas fa-language"></i>
+                        <span data-ar="FR" data-fr="AR">FR</span>
+                    </button>
+                    <button class="menu-btn" id="menuBtn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-menu" id="navMenu">
+            <button class="nav-item active" data-tab="inventory">
+                <i class="fas fa-boxes"></i>
+                <span data-ar="المخزون" data-fr="Inventaire">المخزون</span>
+            </button>
+            <button class="nav-item" data-tab="add-item">
+                <i class="fas fa-plus"></i>
+                <span data-ar="إضافة منتج" data-fr="Ajouter Produit">إضافة منتج</span>
+            </button>
+            <button class="nav-item" data-tab="sales">
+                <i class="fas fa-shopping-cart"></i>
+                <span data-ar="المبيعات" data-fr="Ventes">المبيعات</span>
+            </button>
+            <button class="nav-item" data-tab="reports">
+                <i class="fas fa-chart-bar"></i>
+                <span data-ar="التقارير" data-fr="Rapports">التقارير</span>
+            </button>
+            <button class="nav-item" data-tab="warehouse-return">
+                <i class="fas fa-warehouse"></i>
+                <span data-ar="العودة للمستودع" data-fr="Retour Entrepôt">العودة للمستودع</span>
+            </button>
+            <button class="nav-item" data-tab="settings">
+                <i class="fas fa-cog"></i>
+                <span data-ar="الإعدادات" data-fr="Paramètres">الإعدادات</span>
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Inventory Tab -->
+            <div class="tab-content active" id="inventory-tab">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" data-ar="البحث في المنتجات..." data-fr="Rechercher des produits..." placeholder="البحث في المنتجات...">
+                </div>
+                
+                <div class="inventory-stats">
+                    <div class="stat-card">
+                        <i class="fas fa-cubes"></i>
+                        <div>
+                            <span class="stat-number" id="totalItems">0</span>
+                            <span class="stat-label" data-ar="إجمالي المنتجات" data-fr="Total Produits">إجمالي المنتجات</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-dollar-sign"></i>
+                        <div>
+                            <span class="stat-number" id="totalValue">0</span>
+                            <span class="stat-label" data-ar="القيمة الإجمالية" data-fr="Valeur Totale">القيمة الإجمالية</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inventory-list" id="inventoryList">
+                    <!-- Items will be populated here -->
+                </div>
+            </div>
+
+            <!-- Sales Tab -->
+            <div class="tab-content" id="sales-tab">
+                <div class="sales-header">
+                    <h2 data-ar="نقطة البيع" data-fr="Point de Vente">نقطة البيع</h2>
+                    <button class="btn-primary" id="newSaleBtn">
+                        <i class="fas fa-plus"></i>
+                        <span data-ar="فاتورة جديدة" data-fr="Nouvelle Facture">فاتورة جديدة</span>
+                    </button>
+                </div>
+
+                <!-- Current Sale -->
+                <div class="current-sale" id="currentSale" style="display: none;">
+                    <div class="sale-header">
+                        <h3 data-ar="فاتورة رقم" data-fr="Facture N°">فاتورة رقم</h3>
+                        <span id="invoiceNumber">#001</span>
+                        <button class="btn-secondary" id="cancelSale">
+                            <i class="fas fa-times"></i>
+                            <span data-ar="إلغاء" data-fr="Annuler">إلغاء</span>
+                        </button>
+                    </div>
+
+                    <!-- Customer Info -->
+                    <div class="customer-section">
+                        <h4 data-ar="معلومات العميل" data-fr="Informations Client">معلومات العميل</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label data-ar="اسم العميل" data-fr="Nom Client">اسم العميل</label>
+                                <input type="text" id="customerName" placeholder="">
+                            </div>
+                            <div class="form-group">
+                                <label data-ar="رقم الهاتف" data-fr="Téléphone">رقم الهاتف</label>
+                                <input type="tel" id="customerPhone" placeholder="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Items to Sale -->
+                    <div class="add-to-sale">
+                        <h4 data-ar="إضافة منتجات" data-fr="Ajouter Produits">إضافة منتجات</h4>
+                        <div class="product-selector">
+                            <select id="saleProductSelect">
+                                <option value="" data-ar="اختر منتج" data-fr="Choisir Produit">اختر منتج</option>
+                            </select>
+                            <input type="number" id="saleQuantity" min="1" placeholder="الكمية" data-ar="الكمية" data-fr="Quantité">
+                            <button type="button" class="btn-primary" id="addToSaleBtn">
+                                <i class="fas fa-plus"></i>
+                                <span data-ar="إضافة" data-fr="Ajouter">إضافة</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sale Items -->
+                    <div class="sale-items" id="saleItems">
+                        <!-- Sale items will be populated here -->
+                    </div>
+
+                    <!-- Sale Total -->
+                    <div class="sale-total">
+                        <div class="total-row">
+                            <span data-ar="المجموع الفرعي:" data-fr="Sous-total:">المجموع الفرعي:</span>
+                            <span id="subtotal">$0.00</span>
+                        </div>
+                        <div class="total-row">
+                            <span data-ar="الضريبة (10%):" data-fr="TVA (10%):">الضريبة (10%):</span>
+                            <span id="taxAmount">$0.00</span>
+                        </div>
+                        <div class="total-row final-total">
+                            <span data-ar="الإجمالي:" data-fr="Total:">الإجمالي:</span>
+                            <span id="finalTotal">$0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Sale Actions -->
+                    <div class="sale-actions">
+                        <button class="btn-secondary" id="saveDraftBtn">
+                            <i class="fas fa-save"></i>
+                            <span data-ar="حفظ مسودة" data-fr="Sauvegarder">حفظ مسودة</span>
+                        </button>
+                        <button class="btn-primary" id="completeSaleBtn">
+                            <i class="fas fa-check"></i>
+                            <span data-ar="إتمام البيع" data-fr="Finaliser Vente">إتمام البيع</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sales History -->
+                <div class="sales-history">
+                    <div class="section-header">
+                        <h3 data-ar="تاريخ المبيعات" data-fr="Historique Ventes">تاريخ المبيعات</h3>
+                        <div class="filter-controls">
+                            <select id="salesFilter">
+                                <option value="all" data-ar="جميع المبيعات" data-fr="Toutes Ventes">جميع المبيعات</option>
+                                <option value="today" data-ar="اليوم" data-fr="Aujourd'hui">اليوم</option>
+                                <option value="week" data-ar="هذا الأسبوع" data-fr="Cette Semaine">هذا الأسبوع</option>
+                                <option value="month" data-ar="هذا الشهر" data-fr="Ce Mois">هذا الشهر</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="sales-list" id="salesList">
+                        <!-- Sales history will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Item Tab -->
+            <div class="tab-content" id="add-item-tab">
+                <form class="add-item-form" id="addItemForm">
+                    <h2 data-ar="إضافة منتج جديد" data-fr="Ajouter Nouveau Produit">إضافة منتج جديد</h2>
+                    
+                    <div class="form-group">
+                        <label data-ar="اسم المنتج" data-fr="Nom du Produit">اسم المنتج</label>
+                        <input type="text" id="itemName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label data-ar="الفئة" data-fr="Catégorie">الفئة</label>
+                        <select id="itemCategory" required>
+                            <option value="" data-ar="اختر الفئة" data-fr="Choisir Catégorie">اختر الفئة</option>
+                            <option value="electronics" data-ar="إلكترونيات" data-fr="Électronique">إلكترونيات</option>
+                            <option value="clothing" data-ar="ملابس" data-fr="Vêtements">ملابس</option>
+                            <option value="food" data-ar="طعام" data-fr="Nourriture">طعام</option>
+                            <option value="books" data-ar="كتب" data-fr="Livres">كتب</option>
+                            <option value="other" data-ar="أخرى" data-fr="Autre">أخرى</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label data-ar="الكمية" data-fr="Quantité">الكمية</label>
+                            <input type="number" id="itemQuantity" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label data-ar="السعر" data-fr="Prix">السعر</label>
+                            <input type="number" id="itemPrice" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label data-ar="الوصف" data-fr="Description">الوصف</label>
+                        <textarea id="itemDescription" rows="3"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-plus"></i>
+                        <span data-ar="إضافة المنتج" data-fr="Ajouter Produit">إضافة المنتج</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Reports Tab -->
+            <div class="tab-content" id="reports-tab">
+                <h2 data-ar="التقارير والإحصائيات" data-fr="Rapports et Statistiques">التقارير والإحصائيات</h2>
+                
+                <div class="report-cards">
+                    <div class="report-card">
+                        <h3 data-ar="المنتجات حسب الفئة" data-fr="Produits par Catégorie">المنتجات حسب الفئة</h3>
+                        <div class="chart-container" id="categoryChart"></div>
+                    </div>
+                    
+                    <div class="report-card">
+                        <h3 data-ar="المنتجات منخفضة المخزون" data-fr="Produits en Rupture">المنتجات منخفضة المخزون</h3>
+                        <div id="lowStockItems"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Warehouse Return Tab -->
+            <div class="tab-content" id="warehouse-return-tab">
+                <div class="warehouse-return-header">
+                    <h2 data-ar="العودة إلى المستودع" data-fr="Retour à l'Entrepôt">العودة إلى المستودع</h2>
+                    <p data-ar="إنهاء الجولة التجارية وإعداد تقرير شامل" data-fr="Finaliser la tournée commerciale et préparer un rapport complet">إنهاء الجولة التجارية وإعداد تقرير شامل</p>
+                </div>
+
+                <!-- Current Status Overview -->
+                <div class="return-overview">
+                    <h3 data-ar="ملخص الجولة الحالية" data-fr="Résumé de la Tournée Actuelle">ملخص الجولة الحالية</h3>
+                    
+                    <div class="overview-stats">
+                        <div class="overview-card">
+                            <i class="fas fa-shopping-cart"></i>
+                            <div>
+                                <span class="overview-number" id="totalSalesCount">0</span>
+                                <span class="overview-label" data-ar="إجمالي المبيعات" data-fr="Total Ventes">إجمالي المبيعات</span>
+                            </div>
+                        </div>
+                        
+                        <div class="overview-card">
+                            <i class="fas fa-dollar-sign"></i>
+                            <div>
+                                <span class="overview-number" id="totalRevenue">$0.00</span>
+                                <span class="overview-label" data-ar="إجمالي الإيرادات" data-fr="Revenus Totaux">إجمالي الإيرادات</span>
+                            </div>
+                        </div>
+                        
+                        <div class="overview-card">
+                            <i class="fas fa-boxes"></i>
+                            <div>
+                                <span class="overview-number" id="remainingItems">0</span>
+                                <span class="overview-label" data-ar="المنتجات المتبقية" data-fr="Produits Restants">المنتجات المتبقية</span>
+                            </div>
+                        </div>
+                        
+                        <div class="overview-card">
+                            <i class="fas fa-percentage"></i>
+                            <div>
+                                <span class="overview-number" id="salesPercentage">0%</span>
+                                <span class="overview-label" data-ar="نسبة المبيعات" data-fr="Taux de Vente">نسبة المبيعات</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Warning Section -->
+                <div class="return-warning">
+                    <div class="warning-content">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <h4 data-ar="تحذير مهم" data-fr="Avertissement Important">تحذير مهم</h4>
+                            <p data-ar="العودة إلى المستودع ستؤدي إلى إنشاء تقرير نهائي وإفراغ المخزون بالكامل. هذا الإجراء لا يمكن التراجع عنه." data-fr="Le retour à l'entrepôt générera un rapport final et videra complètement l'inventaire. Cette action est irréversible.">العودة إلى المستودع ستؤدي إلى إنشاء تقرير نهائي وإفراغ المخزون بالكامل. هذا الإجراء لا يمكن التراجع عنه.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Process Steps -->
+                <div class="return-process">
+                    <h3 data-ar="خطوات العودة إلى المستودع" data-fr="Étapes de Retour à l'Entrepôt">خطوات العودة إلى المستودع</h3>
+                    
+                    <div class="process-steps">
+                        <div class="process-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4 data-ar="إنشاء التقرير الشامل" data-fr="Génération du Rapport Complet">إنشاء التقرير الشامل</h4>
+                                <p data-ar="سيتم إنشاء تقرير مفصل بجميع المبيعات والإحصائيات" data-fr="Un rapport détaillé avec toutes les ventes et statistiques sera généré">سيتم إنشاء تقرير مفصل بجميع المبيعات والإحصائيات</p>
+                            </div>
+                        </div>
+                        
+                        <div class="process-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4 data-ar="طباعة وتصدير التقرير" data-fr="Impression et Export du Rapport">طباعة وتصدير التقرير</h4>
+                                <p data-ar="إمكانية طباعة التقرير أو تصديره كملف" data-fr="Possibilité d'imprimer le rapport ou de l'exporter en fichier">إمكانية طباعة التقرير أو تصديره كملف</p>
+                            </div>
+                        </div>
+                        
+                        <div class="process-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4 data-ar="إفراغ المخزون" data-fr="Vidage de l'Inventaire">إفراغ المخزون</h4>
+                                <p data-ar="سيتم حذف جميع المنتجات المتبقية من المخزون" data-fr="Tous les produits restants seront supprimés de l'inventaire">سيتم حذف جميع المنتجات المتبقية من المخزون</p>
+                            </div>
+                        </div>
+                        
+                        <div class="process-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4 data-ar="الاستعداد للجولة الجديدة" data-fr="Préparation pour Nouvelle Tournée">الاستعداد للجولة الجديدة</h4>
+                                <p data-ar="النظام جاهز لبدء جولة تجارية جديدة" data-fr="Le système sera prêt pour une nouvelle tournée commerciale">النظام جاهز لبدء جولة تجارية جديدة</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Confirmation Section -->
+                <div class="return-confirmation">
+                    <div class="confirmation-checkbox">
+                        <input type="checkbox" id="confirmReturn" />
+                        <label for="confirmReturn" data-ar="أؤكد أنني أريد العودة إلى المستودع وإنهاء الجولة الحالية" data-fr="Je confirme vouloir retourner à l'entrepôt et finaliser la tournée actuelle">أؤكد أنني أريد العودة إلى المستودع وإنهاء الجولة الحالية</label>
+                    </div>
+                    
+                    <div class="confirmation-actions">
+                        <button class="btn-primary" id="generateReportBtn" disabled>
+                            <i class="fas fa-file-alt"></i>
+                            <span data-ar="إنشاء التقرير والعودة" data-fr="Générer Rapport et Retourner">إنشاء التقرير والعودة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="tab-content" id="settings-tab">
+                <h2 data-ar="الإعدادات" data-fr="Paramètres">الإعدادات</h2>
+                
+                <div class="settings-group">
+                    <h3 data-ar="البيانات" data-fr="Données">البيانات</h3>
+                    <button class="btn-secondary" id="exportBtn">
+                        <i class="fas fa-download"></i>
+                        <span data-ar="تصدير البيانات" data-fr="Exporter Données">تصدير البيانات</span>
+                    </button>
+                    <button class="btn-danger" id="clearDataBtn">
+                        <i class="fas fa-trash"></i>
+                        <span data-ar="مسح جميع البيانات" data-fr="Effacer Toutes Données">مسح جميع البيانات</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Final Report Modal -->
+        <div class="modal" id="finalReportModal">
+            <div class="modal-content final-report-content">
+                <div class="modal-header">
+                    <h3 data-ar="التقرير النهائي للجولة" data-fr="Rapport Final de Tournée">التقرير النهائي للجولة</h3>
+                    <div class="report-actions">
+                        <button class="btn-secondary" id="printFinalReportBtn">
+                            <i class="fas fa-print"></i>
+                            <span data-ar="طباعة" data-fr="Imprimer">طباعة</span>
+                        </button>
+                        <button class="btn-secondary" id="exportFinalReportBtn">
+                            <i class="fas fa-download"></i>
+                            <span data-ar="تصدير" data-fr="Exporter">تصدير</span>
+                        </button>
+                        <button class="close-btn" id="closeFinalReportModal">&times;</button>
+                    </div>
+                </div>
+                <div class="final-report-content-area" id="finalReportContent">
+                    <!-- Final report content will be generated here -->
+                </div>
+                <div class="final-report-footer">
+                    <button class="btn-danger" id="confirmInventoryResetBtn">
+                        <i class="fas fa-trash-alt"></i>
+                        <span data-ar="تأكيد إفراغ المخزون" data-fr="Confirmer Vidage Inventaire">تأكيد إفراغ المخزون</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice Modal -->
+        <div class="modal" id="invoiceModal">
+            <div class="modal-content invoice-content">
+                <div class="modal-header">
+                    <h3 data-ar="فاتورة" data-fr="Facture">فاتورة</h3>
+                    <div class="invoice-actions">
+                        <button class="btn-secondary" id="printInvoiceBtn">
+                            <i class="fas fa-print"></i>
+                            <span data-ar="طباعة" data-fr="Imprimer">طباعة</span>
+                        </button>
+                        <button class="close-btn" id="closeInvoiceModal">&times;</button>
+                    </div>
+                </div>
+                <div class="invoice-content-area" id="invoiceContent">
+                    <!-- Invoice content will be generated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <div class="modal" id="editModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 data-ar="تعديل المنتج" data-fr="Modifier Produit">تعديل المنتج</h3>
+                    <button class="close-btn" id="closeModal">&times;</button>
+                </div>
+                <form id="editItemForm">
+                    <div class="form-group">
+                        <label data-ar="اسم المنتج" data-fr="Nom du Produit">اسم المنتج</label>
+                        <input type="text" id="editItemName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label data-ar="الفئة" data-fr="Catégorie">الفئة</label>
+                        <select id="editItemCategory" required>
+                            <option value="electronics" data-ar="إلكترونيات" data-fr="Électronique">إلكترونيات</option>
+                            <option value="clothing" data-ar="ملابس" data-fr="Vêtements">ملابس</option>
+                            <option value="food" data-ar="طعام" data-fr="Nourriture">طعام</option>
+                            <option value="books" data-ar="كتب" data-fr="Livres">كتب</option>
+                            <option value="other" data-ar="أخرى" data-fr="Autre">أخرى</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label data-ar="الكمية" data-fr="Quantité">الكمية</label>
+                            <input type="number" id="editItemQuantity" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label data-ar="السعر" data-fr="Prix">السعر</label>
+                            <input type="number" id="editItemPrice" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label data-ar="الوصف" data-fr="Description">الوصف</label>
+                        <textarea id="editItemDescription" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" id="cancelEdit" data-ar="إلغاء" data-fr="Annuler">إلغاء</button>
+                        <button type="submit" class="btn-primary" data-ar="حفظ التغييرات" data-fr="Sauvegarder">حفظ التغييرات</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
